@@ -66,7 +66,7 @@ locals {
 #!/bin/bash
 # use the latest, or set the specific version
 LATEST_VER=$(curl -sI https://www.banyanops.com/netting/connector/latest | awk '/Location:/ {print $2}' | grep -Po '(?<=connector-)\S+(?=.tar.gz)')
-INPUT_VER=${var.package_version}
+INPUT_VER="${var.package_version}"
 VER="$LATEST_VER" && [[ ! -z "$INPUT_VAR" ]] && VER="$INPUT_VER"
 # create folder for the Tarball
 mkdir -p /opt/banyan-packages
@@ -85,6 +85,8 @@ INIT_SCRIPT
 }
 
 resource "azurerm_linux_virtual_machine" "connector_vm" {
+  depends_on = [time_sleep.connector_health_check]
+  
   name                = "${var.name_prefix}-connector"
   location            = var.location
   resource_group_name = var.resource_group_name
